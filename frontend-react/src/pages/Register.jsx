@@ -1,7 +1,7 @@
 import React, { useState } from "react"; 
 import "../styles/page.css"; 
 import { useNavigate } from "react-router-dom";
-const Register = () => { const navigate = useNavigate(); const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "" }); const [error, setError] = useState(""); const [success, setSuccess] = useState(""); const [isRegistered, setIsRegistered] = useState(false); const handleChange = (e) => { setFormData({ ...formData, [e.target.name]: e.target.value }); }; 
+const Register = () => { const navigate = useNavigate(); const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "" }); const [error, setError] = useState("");  const [isRegistered, setIsRegistered] = useState(false); const handleChange = (e) => { setFormData({ ...formData, [e.target.name]: e.target.value }); }; 
 const validate = () => {
   const { name, email, password, confirmPassword } = formData;
 
@@ -25,7 +25,8 @@ const validate = () => {
   if (!/[a-z]/.test(password))
     return "Password must contain at least one lowercase letter";
 
-  if (!/[!@#$%&*()\-\+=^\.]/.test(password))
+  
+  if (!/[!@#$%&*()\-\+=^.]/.test(password))  
     return "Password must contain at least one special character (!@#$%&*()-+=^.)";
 
   if (/\s/.test(password))
@@ -114,4 +115,5 @@ return (
   </div>
 );
 };
+
 export default Register;
