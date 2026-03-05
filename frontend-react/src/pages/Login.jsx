@@ -15,7 +15,7 @@ const Login = ({ setIsLoggedIn }) => {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5001/login", {
+      const res = await fetch("https://test-automation-12.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -77,4 +77,5 @@ const Login = ({ setIsLoggedIn }) => {
     </div>
   </div>
 ); }; export default Login
+
 
