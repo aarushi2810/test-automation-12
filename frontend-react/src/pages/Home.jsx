@@ -7,12 +7,13 @@ export default function Home() {
     <div className="page-home">
       <section className="home-hero">
         <div className="home-copy">
-          <span className="dashboard-section-label">EcoCharge platform</span>
-          <h1>Monitor, predict, and exchange solar energy in one dark dashboard.</h1>
+          <span className="dashboard-section-label">Predict. Share.</span>
+          <h1>Power Your Community.</h1>
           <p>
-            EcoCharge brings present generation, forecasting, and neighborhood
-            energy sharing into a single experience with modern analytics and a
-            marketplace-first interface.
+            Solar prediction engine for societies and apartment complexes.
+            Estimate production, track generation history, and trade surplus
+            energy with your neighbours - turning wasted kilowatts into
+            community revenue.
           </p>
 
           <div className="home-actions">
