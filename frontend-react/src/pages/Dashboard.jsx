@@ -1,5 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "../styles/page.css";
+import {
+  addPredictionEntry,
+  getPredictionAnalytics,
+  getPredictionHistory,
+  getTodayGeneration,
+  subscribeToPredictionHistory
+} from "../utils/predictionHistory";
 
 const liveSeries = [0.18, 0.34, 0.49, 0.62, 0.58, 0.74, 0.8];
 
@@ -11,13 +18,6 @@ const initialInputs = {
   rollingAverage: 0.64
 };
 
-const initialHistory = [
-  { id: 1, date: "2026-04-08", irradiance: 705, temp: 29, output: 0.63 },
-  { id: 2, date: "2026-04-09", irradiance: 748, temp: 30, output: 0.7 },
-  { id: 3, date: "2026-04-10", irradiance: 790, temp: 32, output: 0.78 },
-  { id: 4, date: "2026-04-11", irradiance: 735, temp: 28, output: 0.67 }
-];
-
 const formatDate = (date) =>
   new Intl.DateTimeFormat("en-IN", {
     day: "2-digit",
@@ -25,34 +25,28 @@ const formatDate = (date) =>
     year: "numeric"
   }).format(date);
 
+const formatBestDay = (value) => {
+  if (!value || value === "N/A") {
+    return "No data";
+  }
+
+  return formatDate(new Date(value));
+};
+
 export default function Dashboard() {
   const [inputs, setInputs] = useState(initialInputs);
   const [predictionResult, setPredictionResult] = useState(null);
-  const [history, setHistory] = useState(initialHistory);
+  const [history, setHistory] = useState(() => getPredictionHistory());
+
+  useEffect(() => subscribeToPredictionHistory(setHistory), []);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setInputs((current) => ({ ...current, [name]: Number(value) }));
   };
 
-  const analytics = useMemo(() => {
-    const totalPredictions = history.length;
-    const outputs = history.map((item) => item.output);
-    const avgOutput =
-      outputs.reduce((sum, value) => sum + value, 0) / (outputs.length || 1);
-    const maxOutput = outputs.length ? Math.max(...outputs) : 0;
-    const bestDayRecord = history.reduce(
-      (best, item) => (item.output > best.output ? item : best),
-      history[0] || { date: "N/A", output: 0 }
-    );
-
-    return {
-      totalPredictions,
-      avgOutput,
-      maxOutput,
-      bestDay: bestDayRecord.date
-    };
-  }, [history]);
+  const analytics = useMemo(() => getPredictionAnalytics(history), [history]);
+  const todayGeneration = useMemo(() => getTodayGeneration(history), [history]);
 
   const generatePrediction = () => {
     const estimatedOutput =
@@ -63,19 +57,12 @@ export default function Dashboard() {
       inputs.temperature * 0.0065;
 
     const safeOutput = Math.max(0.12, Number(estimatedOutput.toFixed(2)));
-    const today = new Date();
-
     setPredictionResult(safeOutput);
-    setHistory((current) => [
-      {
-        id: Date.now(),
-        date: today.toISOString().split("T")[0],
-        irradiance: inputs.irradiance,
-        temp: inputs.temperature,
-        output: safeOutput
-      },
-      ...current
-    ]);
+    addPredictionEntry({
+      irradiance: inputs.irradiance,
+      temperature: inputs.temperature,
+      output: safeOutput
+    });
   };
 
   return (
@@ -88,7 +75,9 @@ export default function Dashboard() {
           </div>
           <p className="dashboard-eyebrow">Present generation</p>
           <h1>Current output</h1>
-          <div className="dashboard-current-output">0.8 kW</div>
+          <div className="dashboard-current-output">
+            {analytics.latestOutput.toFixed(2)} kW
+          </div>
           <p className="dashboard-support">
             Rooftop generation is healthy and trending above yesterday’s midday
             curve.
@@ -98,11 +87,11 @@ export default function Dashboard() {
         <div className="dashboard-live-stats">
           <div className="metric-glow-card">
             <span>Today so far</span>
-            <strong>12.4 kWh</strong>
+            <strong>{todayGeneration.toFixed(1)} kWh</strong>
           </div>
           <div className="metric-glow-card">
             <span>Peak output</span>
-            <strong>1.9 kW</strong>
+            <strong>{analytics.maxOutput.toFixed(2)} kW</strong>
           </div>
           <div className="metric-glow-card">
             <span>Efficiency</span>
@@ -247,7 +236,7 @@ export default function Dashboard() {
             </div>
             <div className="dashboard-card analytics-card">
               <span>Best day</span>
-              <strong>{analytics.bestDay}</strong>
+              <strong>{formatBestDay(analytics.bestDay)}</strong>
             </div>
           </div>
 
