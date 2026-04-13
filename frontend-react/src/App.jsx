@@ -12,6 +12,14 @@ import Login from "./pages/Login";
 
 import "./App.css";
 
+function ProtectedRoute({ isLoggedIn, children }) {
+  return isLoggedIn ? children : <Navigate to="/login" replace />;
+}
+
+function PublicAuthRoute({ isLoggedIn, children }) {
+  return isLoggedIn ? <Navigate to="/dashboard" replace /> : children;
+}
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("user"));
 
@@ -33,16 +41,50 @@ function App() {
           <div className="container">
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/share-energy" element={<ShareEnergy />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute isLoggedIn={isLoggedIn}>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/share-energy"
+                element={
+                  <ProtectedRoute isLoggedIn={isLoggedIn}>
+                    <ShareEnergy />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/login"
-                element={<Login setIsLoggedIn={setIsLoggedIn} />}
+                element={
+                  <PublicAuthRoute isLoggedIn={isLoggedIn}>
+                    <Login setIsLoggedIn={setIsLoggedIn} />
+                  </PublicAuthRoute>
+                }
               />
-              <Route path="/register" element={<Register />} />
-              <Route path="/predict" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/contact" element={<Navigate to="/share-energy" replace />} />
-              <Route path="/about" element={<Navigate to="/dashboard" replace />} />
+              <Route
+                path="/register"
+                element={
+                  <PublicAuthRoute isLoggedIn={isLoggedIn}>
+                    <Register />
+                  </PublicAuthRoute>
+                }
+              />
+              <Route
+                path="/predict"
+                element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />}
+              />
+              <Route
+                path="/contact"
+                element={<Navigate to={isLoggedIn ? "/share-energy" : "/login"} replace />}
+              />
+              <Route
+                path="/about"
+                element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />}
+              />
               <Route path="*" element={<Home />} />
             </Routes>
           </div>
