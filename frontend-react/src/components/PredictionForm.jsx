@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { API_ENDPOINTS } from "../config";
+import { addPredictionEntry } from "../utils/predictionHistory";
 
 const PredictionForm = ({ setPrediction }) => {
   const [formData, setFormData] = useState({
@@ -98,6 +99,11 @@ const PredictionForm = ({ setPrediction }) => {
       const predictedPower = parseFloat(result.predictedPower).toFixed(2);
       setPrediction(predictedPower);
       localStorage.setItem("lastPrediction", result.predictedPower);
+      addPredictionEntry({
+        irradiance: formData.irradiance,
+        temperature: formData.temp,
+        output: predictedPower
+      });
     } catch (err) {
       console.error(err);
       setPrediction("Error connecting to backend!");
