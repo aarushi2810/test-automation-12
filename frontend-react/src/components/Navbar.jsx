@@ -26,20 +26,22 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
           <NavLink to="/" className="nav-link">
             Home
           </NavLink>
-          <NavLink to="/dashboard" className="nav-link">
-            Dashboard
-          </NavLink>
-          <NavLink to="/share-energy" className="nav-link">
-            Share Energy
-          </NavLink>
-          {!isLoggedIn ? (
+          {isLoggedIn ? (
+            <>
+              <NavLink to="/dashboard" className="nav-link">
+                Dashboard
+              </NavLink>
+              <NavLink to="/share-energy" className="nav-link">
+                Share Energy
+              </NavLink>
+              <button type="button" className="nav-link logout-btn nav-link-accent" onClick={logout}>
+                Logout
+              </button>
+            </>
+          ) : (
             <NavLink to="/login" className="nav-link nav-link-accent">
               Login
             </NavLink>
-          ) : (
-            <button type="button" className="nav-link logout-btn" onClick={logout}>
-              Logout
-            </button>
           )}
         </nav>
       </div>
