@@ -4,7 +4,7 @@ const { spawn } = require("child_process");
 const pythonExecutable = process.env.PYTHON_EXECUTABLE || "python";
 const modelPath = path.resolve(
   __dirname,
-  process.env.MODEL_PATH || "../ml_backend/model.pkl"
+  process.env.MODEL_PATH || "../../ml_backend/model.pkl"
 );
 const scriptPath = path.resolve(__dirname, "../scripts/predict_model.py");
 
