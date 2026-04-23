@@ -8,6 +8,7 @@ const bcrypt = require("bcryptjs");
 const User = require("./models/User");
 const Message = require("./models/Message");
 const Prediction = require("./models/Prediction");
+const EnergyListing = require("./models/EnergyListing");
 const { runModelPrediction } = require("./services/predictService");
 
 const app = express();
@@ -37,6 +38,8 @@ const validatePredictionPayload = (data) => {
   return null;
 };
 
+// ── Health & Root ─────────────────────────────────────────────────
+
 app.get("/", (_request, response) => {
   response.send("<h3>EcoCharge Node.js API running. Use /predict, /login, /register and /contact</h3>");
 });
@@ -47,6 +50,8 @@ app.get("/health", async (_request, response) => {
     database: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
   });
 });
+
+// ── Auth ──────────────────────────────────────────────────────────
 
 app.post("/register", async (request, response) => {
   try {
@@ -109,6 +114,8 @@ app.post("/login", async (request, response) => {
   }
 });
 
+// ── Contact ───────────────────────────────────────────────────────
+
 app.post("/contact", async (request, response) => {
   try {
     const name = String(request.body.name || "").trim();
@@ -126,6 +133,8 @@ app.post("/contact", async (request, response) => {
     response.status(500).json({ error: error.message });
   }
 });
+
+// ── ML Prediction ─────────────────────────────────────────────────
 
 app.post("/predict", async (request, response) => {
   try {
@@ -181,6 +190,121 @@ app.get("/logs", async (_request, response) => {
     response.status(500).json({ error: error.message });
   }
 });
+
+// ── Energy Listings ───────────────────────────────────────────────
+
+// GET /listings — public, browse all active listings (marketplace)
+app.get("/listings", async (request, response) => {
+  try {
+    const listings = await EnergyListing.find({ status: "active" })
+      .sort({ createdAt: -1 });
+    response.json({ listings });
+  } catch (error) {
+    response.status(500).json({ error: error.message });
+  }
+});
+
+// GET /my-listings?userId=xxx — get all listings created by a user
+app.get("/my-listings", async (request, response) => {
+  try {
+    const { userId } = request.query;
+    if (!userId) {
+      return response.status(400).json({ error: "userId is required" });
+    }
+
+    const listings = await EnergyListing.find({ userId })
+      .sort({ createdAt: -1 });
+    response.json({ listings });
+  } catch (error) {
+    response.status(500).json({ error: error.message });
+  }
+});
+
+// POST /listings — create a new energy listing
+app.post("/listings", async (request, response) => {
+  try {
+    const {
+      userId,
+      apartmentName,
+      unit,
+      area,
+      availableEnergy,
+      pricePerKwh,
+      timeSlot
+    } = request.body;
+
+    if (!userId || !apartmentName || !unit || !area || !availableEnergy || !pricePerKwh || !timeSlot) {
+      return response.status(400).json({ error: "All fields are required." });
+    }
+
+    const listing = await EnergyListing.create({
+      userId,
+      apartmentName,
+      unit,
+      area,
+      availableEnergy: parseFloat(availableEnergy),
+      pricePerKwh: parseFloat(pricePerKwh),
+      timeSlot,
+      status: "active"
+    });
+
+    response.status(201).json({ listing });
+  } catch (error) {
+    response.status(500).json({ error: error.message });
+  }
+});
+
+// PATCH /listings/:id/status — toggle a listing active / inactive
+app.patch("/listings/:id/status", async (request, response) => {
+  try {
+    const { userId, status } = request.body;
+
+    if (!userId || !status) {
+      return response.status(400).json({ error: "userId and status are required." });
+    }
+
+    const listing = await EnergyListing.findOne({
+      _id: request.params.id,
+      userId
+    });
+
+    if (!listing) {
+      return response.status(404).json({ error: "Listing not found." });
+    }
+
+    listing.status = status;
+    await listing.save();
+    response.json({ listing });
+  } catch (error) {
+    response.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE /listings/:id — delete a listing (only owner)
+app.delete("/listings/:id", async (request, response) => {
+  try {
+    const { userId } = request.body;
+
+    if (!userId) {
+      return response.status(400).json({ error: "userId is required." });
+    }
+
+    const listing = await EnergyListing.findOneAndDelete({
+      _id: request.params.id,
+      userId
+    });
+
+    if (!listing) {
+      return response.status(404).json({ error: "Listing not found." });
+    }
+
+    response.json({ message: "Listing deleted." });
+  } catch (error) {
+    response.status(500).json({ error: error.message });
+  }
+});
+
+// ── Start Server ──────────────────────────────────────────────────
 
 async function startServer() {
   if (!mongoUri) {
