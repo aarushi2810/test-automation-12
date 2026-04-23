@@ -1,110 +1,189 @@
-import React, { useMemo, useState } from "react";
-import "../styles/page.css";
+import { useState, useEffect } from "react";
 import MyListings from "../components/MyListings";
+import "./ShareEnergy.css";
 
-const energyListings = [
-  { id: 1, apartment: "Skyline Residency", energy: 18, price: 7.2, distance: 1.4, badge: "High surplus" },
-  { id: 2, apartment: "Sunview Towers",    energy: 12, price: 6.8, distance: 2.1, badge: "Best rate"    },
-  { id: 3, apartment: "Green Nest Society",energy: 24, price: 8.1, distance: 3.8, badge: "Fast approval"},
-  { id: 4, apartment: "Aurora Heights",    energy: 15, price: 7.6, distance: 1.9, badge: "Nearby"       },
-];
+const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5001";
 
-export default function ShareEnergy() {
-  const [activeTab, setActiveTab] = useState("browse"); // "browse" | "my-listings"
-  const [sortBy,    setSortBy]    = useState("distance");
-  const [filterBy,  setFilterBy]  = useState("all");
+// ── Badge config for marketplace cards ───────────────────────────
+const BADGE_CONFIG = {
+  "High surplus": { bg: "#2a3a1a", color: "#86efac" },
+  "Nearby":       { bg: "#1a2a3a", color: "#93c5fd" },
+  "Best rate":    { bg: "#2a1a3a", color: "#d8b4fe" },
+  "Fast approval":{ bg: "#3a2a1a", color: "#fcd34d" },
+};
 
-  const listings = useMemo(() => {
-    let next = [...energyListings];
-    if (filterBy === "high")   next = next.filter((i) => i.energy >= 18);
-    if (filterBy === "budget") next = next.filter((i) => i.price  <= 7.2);
-    if (sortBy === "price")    next.sort((a, b) => a.price    - b.price);
-    if (sortBy === "energy")   next.sort((a, b) => b.energy   - a.energy);
-    if (sortBy === "distance") next.sort((a, b) => a.distance - b.distance);
-    return next;
-  }, [filterBy, sortBy]);
+const getBadge = (index) => {
+  const badges = Object.keys(BADGE_CONFIG);
+  return badges[index % badges.length];
+};
+
+// ── Main Component ────────────────────────────────────────────────
+const ShareEnergy = () => {
+  const [activeTab, setActiveTab] = useState("browse");
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sort, setSort] = useState("nearest");
+  const [filterStatus, setFilterStatus] = useState("all");
+
+  useEffect(() => {
+    if (activeTab === "browse") fetchListings();
+  }, [activeTab]);
+
+  const fetchListings = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/listings`);
+      const data = await res.json();
+      setListings(data.listings || []);
+    } catch (err) {
+      console.error("Failed to fetch listings:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRequestEnergy = (listing) => {
+    alert(`Energy request sent to ${listing.apartmentName}!\nWe'll notify you once confirmed.`);
+    // TODO: wire up to your request/booking endpoint
+  };
+
+  // Sort logic
+  const sorted = [...listings].sort((a, b) => {
+    if (sort === "price_asc")  return a.pricePerKwh - b.pricePerKwh;
+    if (sort === "price_desc") return b.pricePerKwh - a.pricePerKwh;
+    if (sort === "energy")     return b.availableEnergy - a.availableEnergy;
+    return 0; // "nearest" – keep server order
+  });
 
   return (
-    <div className="page-share-energy">
+    <div className="share-energy-page">
 
-      {/* ── Tab switcher ── */}
-      <div className="share-tabs">
-        <button
-          className={`share-tab ${activeTab === "browse" ? "share-tab--active" : ""}`}
-          onClick={() => setActiveTab("browse")}
-        >
-          Browse Offers
-        </button>
-        <button
-          className={`share-tab ${activeTab === "my-listings" ? "share-tab--active" : ""}`}
-          onClick={() => setActiveTab("my-listings")}
-        >
-          My Listings
-        </button>
+      {/* ── Tab Switcher ── */}
+      <div className="share-tabs-wrapper">
+        <div className="share-tabs">
+          <button
+            className={`share-tab ${activeTab === "browse" ? "share-tab--active" : ""}`}
+            onClick={() => setActiveTab("browse")}
+          >
+            Browse Offers
+          </button>
+          <button
+            className={`share-tab ${activeTab === "my-listings" ? "share-tab--active" : ""}`}
+            onClick={() => setActiveTab("my-listings")}
+          >
+            My Listings
+          </button>
+        </div>
       </div>
 
-      {/* ── Browse tab (existing UI) ── */}
+      {/* ── Browse Tab ── */}
       {activeTab === "browse" && (
-        <>
-          <section className="share-energy-head">
-            <div>
-              <p className="dashboard-eyebrow">Share energy marketplace</p>
-              <h1>Discover nearby surplus solar energy offers.</h1>
-              <p>
+        <div className="browse-section">
+          <div className="browse-header">
+            <div className="browse-header-left">
+              <p className="browse-label">SHARE ENERGY MARKETPLACE</p>
+              <h1 className="browse-title">
+                Discover nearby<br />surplus solar energy offers.
+              </h1>
+              <p className="browse-subtitle">
                 Browse local apartment communities, compare rates, and request
                 access to available solar energy capacity.
               </p>
             </div>
-            <div className="share-energy-filters dashboard-card">
-              <label>
-                <span>Sort</span>
-                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                  <option value="distance">Nearest</option>
-                  <option value="price">Lowest price</option>
-                  <option value="energy">Most energy</option>
-                </select>
-              </label>
-              <label>
-                <span>Filter</span>
-                <select value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
-                  <option value="all">All listings</option>
-                  <option value="high">18+ kWh available</option>
-                  <option value="budget">Budget friendly</option>
-                </select>
-              </label>
-            </div>
-          </section>
 
-          <section className="share-energy-grid">
-            {listings.map((item) => (
-              <article key={item.id} className="dashboard-card energy-market-card">
-                <div className="energy-market-top">
-                  <span className="energy-badge">{item.badge}</span>
-                  <span className="energy-distance">{item.distance} km away</span>
-                </div>
-                <h2>{item.apartment}</h2>
-                <div className="energy-market-metrics">
-                  <div>
-                    <span>Energy</span>
-                    <strong>{item.energy} kWh</strong>
+            <div className="browse-controls">
+              <div className="browse-control-group">
+                <label>SORT</label>
+                <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                >
+                  <option value="nearest">Nearest</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                  <option value="energy">Most Energy</option>
+                </select>
+              </div>
+              <div className="browse-control-group">
+                <label>FILTER</label>
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                >
+                  <option value="all">All listings</option>
+                  <option value="active">Active only</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="browse-loading">
+              <div className="ml-spinner" />
+              <p>Finding nearby offers...</p>
+            </div>
+          ) : sorted.length === 0 ? (
+            <div className="browse-empty">
+              <p>No energy listings available right now.</p>
+            </div>
+          ) : (
+            <div className="browse-grid">
+              {sorted.map((listing, index) => {
+                const badge = getBadge(index);
+                const style = BADGE_CONFIG[badge];
+                return (
+                  <div key={listing._id} className="browse-card">
+                    <div className="browse-card-top">
+                      <span
+                        className="browse-badge"
+                        style={{ background: style.bg, color: style.color }}
+                      >
+                        {badge}
+                      </span>
+                    </div>
+
+                    <h3 className="browse-card-name">{listing.apartmentName}</h3>
+                    <p className="browse-card-area">{listing.area}</p>
+
+                    <div className="browse-card-stats">
+                      <div>
+                        <span className="browse-stat-label">Energy</span>
+                        <span className="browse-stat-value">
+                          {listing.availableEnergy} kWh
+                        </span>
+                      </div>
+                      <div>
+                        <span className="browse-stat-label">Price</span>
+                        <span className="browse-stat-value">
+                          ₹{listing.pricePerKwh}/kWh
+                        </span>
+                      </div>
+                      <div>
+                        <span className="browse-stat-label">Time</span>
+                        <span className="browse-stat-value">
+                          {listing.timeSlot}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      className="btn-request"
+                      onClick={() => handleRequestEnergy(listing)}
+                    >
+                      Request energy
+                    </button>
                   </div>
-                  <div>
-                    <span>Price</span>
-                    <strong>₹{item.price}/kWh</strong>
-                  </div>
-                </div>
-                <button type="button" className="energy-button">
-                  Request energy
-                </button>
-              </article>
-            ))}
-          </section>
-        </>
+                );
+              })}
+            </div>
+          )}
+        </div>
       )}
 
-      {/* ── My Listings tab (new) ── */}
+      {/* ── My Listings Tab ── */}
       {activeTab === "my-listings" && <MyListings />}
-
     </div>
   );
-}
+};
+
+export default ShareEnergy;
