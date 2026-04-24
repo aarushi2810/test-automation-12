@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import CreateListingModal from "./CreateListingModal";
 import "./MyListings.css";
 
-// Replace with your actual API base URL
-const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5001";
 
 const MyListings = () => {
   const [listings, setListings] = useState([]);
@@ -20,10 +19,8 @@ const MyListings = () => {
   const fetchMyListings = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API_BASE}/api/energy/my-listings`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const userId = JSON.parse(localStorage.getItem("user"))?.id;
+      const res = await fetch(`${API_BASE}/my-listings?userId=${userId}`);
       const data = await res.json();
       setListings(data.listings || []);
     } catch (err) {
@@ -34,18 +31,17 @@ const MyListings = () => {
   };
 
   const handleCreateListing = async (formData) => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${API_BASE}/api/energy/listings`, {
+    const userId = JSON.parse(localStorage.getItem("user"))?.id;
+    const res = await fetch(`${API_BASE}/listings`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ ...formData, userId }),
     });
     if (!res.ok) {
       const err = await res.json();
-      throw new Error(err.message || "Failed to create listing");
+      throw new Error(err.error || "Failed to create listing");
     }
     await fetchMyListings(); // Refresh listings after creation
   };
@@ -53,10 +49,11 @@ const MyListings = () => {
   const handleDeleteListing = async (id) => {
     if (!window.confirm("Delete this listing?")) return;
     try {
-      const token = localStorage.getItem("token");
-      await fetch(`${API_BASE}/api/energy/listings/${id}`, {
+      const userId = JSON.parse(localStorage.getItem("user"))?.id;
+      await fetch(`${API_BASE}/listings/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
       });
       setListings((prev) => prev.filter((l) => l._id !== id));
     } catch (err) {
@@ -66,15 +63,14 @@ const MyListings = () => {
 
   const handleToggleStatus = async (id, currentStatus) => {
     try {
-      const token = localStorage.getItem("token");
+      const userId = JSON.parse(localStorage.getItem("user"))?.id;
       const newStatus = currentStatus === "active" ? "inactive" : "active";
-      await fetch(`${API_BASE}/api/energy/listings/${id}/status`, {
+      await fetch(`${API_BASE}/listings/${id}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ userId, status: newStatus }),
       });
       setListings((prev) =>
         prev.map((l) => (l._id === id ? { ...l, status: newStatus } : l))

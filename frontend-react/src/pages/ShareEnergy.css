@@ -1,0 +1,273 @@
+/* ShareEnergy.css */
+
+.share-energy-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 24px 60px;
+  }
+  
+  /* ── Tab Switcher ────────────────────────────────────────────── */
+  
+  .share-tabs-wrapper {
+    margin-bottom: 36px;
+  }
+  
+  .share-tabs {
+    display: inline-flex;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    border-radius: 12px;
+  }
+  
+  .share-tab {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 22px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  
+  .share-tab:hover {
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .share-tab--active {
+    background: #f5a623;
+    color: #0d1117;
+  }
+  
+  /* ── Browse Section ──────────────────────────────────────────── */
+  
+  .browse-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 40px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+  }
+  
+  .browse-header-left {
+    flex: 1;
+    min-width: 240px;
+  }
+  
+  .browse-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #f5a623;
+    margin: 0 0 12px;
+  }
+  
+  .browse-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.2;
+    margin: 0 0 12px;
+  }
+  
+  .browse-subtitle {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 420px;
+  }
+  
+  .browse-controls {
+    background: #161b27;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 200px;
+  }
+  
+  .browse-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .browse-control-group label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  
+  .browse-control-group select {
+    background: #1e2535;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: #ffffff;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  
+  .browse-control-group select:focus {
+    border-color: #f5a623;
+  }
+  
+  /* ── Browse Loading / Empty ──────────────────────────────────── */
+  
+  .browse-loading,
+  .browse-empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  /* Spinner (reused from MyListings) */
+  .ml-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(245, 166, 35, 0.2);
+    border-top-color: #f5a623;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* ── Browse Grid ─────────────────────────────────────────────── */
+  
+  .browse-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+  
+  .browse-card {
+    background: #161b27;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  
+  .browse-card:hover {
+    border-color: rgba(245, 166, 35, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .browse-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .browse-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: 50px;
+  }
+  
+  .browse-card-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 4px 0 0;
+  }
+  
+  .browse-card-area {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0;
+  }
+  
+  .browse-card-stats {
+    display: flex;
+    gap: 14px;
+    padding-top: 14px;
+    margin-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  
+  .browse-card-stats > div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  
+  .browse-stat-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  
+  .browse-stat-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  
+  .btn-request {
+    margin-top: 10px;
+    width: 100%;
+    background: #f5a623;
+    color: #0d1117;
+    border: none;
+    border-radius: 10px;
+    padding: 13px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  
+  .btn-request:hover  { background: #e09620; }
+  .btn-request:active { transform: scale(0.98); }
+  
+  /* ── Responsive ──────────────────────────────────────────────── */
+  
+  @media (max-width: 768px) {
+    .share-energy-page {
+      padding: 16px 16px 60px;
+    }
+  
+    .browse-title {
+      font-size: 24px;
+    }
+  
+    .browse-header {
+      flex-direction: column;
+    }
+  
+    .browse-controls {
+      width: 100%;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+  
+    .browse-control-group {
+      flex: 1;
+      min-width: 140px;
+    }
+  }
