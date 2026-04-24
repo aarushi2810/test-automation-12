@@ -7,6 +7,7 @@ import {
   getTodayGeneration,
   subscribeToPredictionHistory
 } from "../utils/predictionHistory";
+import AnomalyAlerts from "../components/AnomalyAlerts";
 
 const liveSeries = [0.18, 0.34, 0.49, 0.62, 0.58, 0.74, 0.8];
 
@@ -115,6 +116,10 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
+      </section>
+
+      <section className="anomaly-section">
+        <AnomalyAlerts history={history} />
       </section>
 
       <section className="dashboard-grid-layout">

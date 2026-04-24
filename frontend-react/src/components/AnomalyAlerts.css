@@ -1,0 +1,268 @@
+/* ── Anomaly Detection Panel ──────────────────────────────────────── */
+
+.anomaly-panel {
+  padding: 24px;
+  border-radius: 28px;
+  background:
+    radial-gradient(ellipse at top left, rgba(245, 158, 11, 0.06), transparent 50%),
+    linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(15, 23, 42, 0.96));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+/* ── Header ──────────────────────────────────────────────────────── */
+
+.anomaly-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.anomaly-header-left h2 {
+  margin: 4px 0 0;
+  font-size: 1.35rem;
+}
+
+.anomaly-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.anomaly-status--healthy {
+  background: rgba(134, 239, 172, 0.1);
+  border: 1px solid rgba(134, 239, 172, 0.2);
+  color: #86efac;
+}
+
+.anomaly-status--warning {
+  background: rgba(252, 211, 77, 0.1);
+  border: 1px solid rgba(252, 211, 77, 0.2);
+  color: #fcd34d;
+}
+
+.anomaly-status--critical {
+  background: rgba(252, 165, 165, 0.1);
+  border: 1px solid rgba(252, 165, 165, 0.2);
+  color: #fca5a5;
+}
+
+.anomaly-status--info {
+  background: rgba(147, 197, 253, 0.1);
+  border: 1px solid rgba(147, 197, 253, 0.2);
+  color: #93c5fd;
+}
+
+/* ── Quick Stats Row ─────────────────────────────────────────────── */
+
+.anomaly-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.anomaly-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.anomaly-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.anomaly-stat-count {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.anomaly-stat--critical .anomaly-stat-count { color: #fca5a5; }
+.anomaly-stat--warning  .anomaly-stat-count { color: #fcd34d; }
+.anomaly-stat--info     .anomaly-stat-count { color: #93c5fd; }
+.anomaly-stat--healthy  .anomaly-stat-count { color: #86efac; }
+
+.anomaly-stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Alert Cards ─────────────────────────────────────────────────── */
+
+.anomaly-alerts-list {
+  display: grid;
+  gap: 10px;
+}
+
+.anomaly-alert {
+  display: flex;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.2s, border-color 0.3s;
+  animation: alertSlideIn 0.35s ease-out both;
+}
+
+.anomaly-alert:hover {
+  transform: translateX(4px);
+}
+
+@keyframes alertSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anomaly-alert:nth-child(2) { animation-delay: 0.06s; }
+.anomaly-alert:nth-child(3) { animation-delay: 0.12s; }
+.anomaly-alert:nth-child(4) { animation-delay: 0.18s; }
+.anomaly-alert:nth-child(5) { animation-delay: 0.24s; }
+
+.anomaly-alert--critical {
+  background: rgba(239, 68, 68, 0.06);
+  border-color: rgba(239, 68, 68, 0.15);
+}
+
+.anomaly-alert--critical:hover {
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.anomaly-alert--warning {
+  background: rgba(252, 211, 77, 0.04);
+  border-color: rgba(252, 211, 77, 0.12);
+}
+
+.anomaly-alert--warning:hover {
+  border-color: rgba(252, 211, 77, 0.3);
+}
+
+.anomaly-alert--info {
+  background: rgba(147, 197, 253, 0.04);
+  border-color: rgba(147, 197, 253, 0.1);
+}
+
+.anomaly-alert--info:hover {
+  border-color: rgba(147, 197, 253, 0.3);
+}
+
+.anomaly-alert--healthy {
+  background: rgba(134, 239, 172, 0.04);
+  border-color: rgba(134, 239, 172, 0.1);
+}
+
+.anomaly-alert--healthy:hover {
+  border-color: rgba(134, 239, 172, 0.3);
+}
+
+/* ── Alert Internals ─────────────────────────────────────────────── */
+
+.anomaly-alert-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.anomaly-alert-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.anomaly-alert-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.anomaly-alert-title {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #fff7ed;
+}
+
+.anomaly-alert-date {
+  flex-shrink: 0;
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.anomaly-alert-message {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.anomaly-alert-metrics {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.anomaly-alert-metrics strong {
+  color: #fff7ed;
+  font-weight: 600;
+}
+
+.anomaly-metric-divider {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+
+@media (max-width: 720px) {
+  .anomaly-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .anomaly-stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .anomaly-alert-top {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .anomaly-alert-metrics {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .anomaly-panel {
+    padding: 18px;
+  }
+}
