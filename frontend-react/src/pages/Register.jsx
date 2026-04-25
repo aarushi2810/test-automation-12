@@ -28,7 +28,9 @@ const Register = () => {
 
     if (!name || !email || !password || !confirmPassword)
       return "All fields are required";
-
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!nameRegex.test(name))
+       return "Name should contain only alphabets";
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email))
       return "Invalid email format";
